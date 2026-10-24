@@ -169,9 +169,9 @@ plain solid plate that uses the same amount of material, spread evenly (a thinne
 |---|---|---|---|---|---|
 | How much stiffer than a plain plate | 1.41× | 1.38× | 1.33× | 1.29× | 1.23× |
 
-The less material you have, the more it pays to put it in the right place. Below about 30%, the members
-become only 1–2 elements thick on this mesh, and the design falls apart into pieces. Lower amounts of
-material would need a finer mesh.
+The less material you have, the more it pays to put it in the right place. I only studied 30–70% material:
+with less material, the members become very thin on this 120 × 40 mesh, so lower amounts would need a
+finer mesh to resolve them.
 
 ![Trade-off](results/fig_tradeoff.png)
 

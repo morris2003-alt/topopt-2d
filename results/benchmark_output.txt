@@ -1,0 +1,16 @@
+1. Published benchmark (Andreassen et al. 2011, Fig. 3)
+   sensitivity  c = 216.81  published 216.81  diff +0.002%  iterations 106
+   density      c = 233.71  published 233.71  diff +0.002%  iterations 144
+
+2. Mesh refinement, density filter, rmin = 0.04 * nelx
+    60 x 20  c = 233.71  iterations 144  stop: design change
+   120 x 40  c = 236.31  iterations 99  stop: compliance plateau
+   240 x 80  c = 238.15  iterations 149  stop: compliance plateau
+
+3. Cantilever 160x80, volfrac 0.4, density filter
+   c = 88.85  iterations 154  stop: compliance plateau
+
+4. Animation run: MBB 150x50, density filter
+   c = 236.27  iterations 150  stop: compliance plateau  frames 77
+
+Saved figures, GIF and benchmark_summary.json to results/

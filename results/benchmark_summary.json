@@ -1,0 +1,32 @@
+{
+  "mbb60_sensitivity": {
+    "c": 216.8137,
+    "published": 216.81,
+    "iters": 106
+  },
+  "mbb60_density": {
+    "c": 233.7146,
+    "published": 233.71,
+    "iters": 144
+  },
+  "mbb_refine_60x20": {
+    "c": 233.7146,
+    "iters": 144
+  },
+  "mbb_refine_120x40": {
+    "c": 236.3147,
+    "iters": 99
+  },
+  "mbb_refine_240x80": {
+    "c": 238.1491,
+    "iters": 149
+  },
+  "cantilever_160x80": {
+    "c": 88.8512,
+    "iters": 154
+  },
+  "mbb_150x50_animation": {
+    "c": 236.2725,
+    "iters": 150
+  }
+}

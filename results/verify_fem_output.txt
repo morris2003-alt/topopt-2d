@@ -1,0 +1,16 @@
+Case 1: cantilever (L/h = 10), tip deflection vs Timoshenko beam theory
+    10 x  1  dof     44  FEM 1.35778  theory 2.01560  error -32.64%
+    20 x  2  dof    126  FEM 1.79057  theory 2.01560  error -11.16%
+    40 x  4  dof    410  FEM 1.95042  theory 2.01560  error  -3.23%
+    80 x  8  dof   1458  FEM 1.99586  theory 2.01560  error  -0.98%
+   160 x 16  dof   5474  FEM 2.00783  theory 2.01560  error  -0.39%
+   320 x 32  dof  21186  FEM 2.01095  theory 2.01560  error  -0.23%
+
+Case 2: plate with hole (W/a = 10), stress concentration at hole edge vs Kirsch (Kt = 3)
+    8 x  16  dof    306  Kt = 3.0101  error  +0.34%
+   16 x  32  dof   1122  Kt = 3.0307  error  +1.02%
+   32 x  64  dof   4290  Kt = 3.0216  error  +0.72%
+   64 x 128  dof  16770  Kt = 3.0124  error  +0.41%
+  128 x 256  dof  66306  Kt = 3.0066  error  +0.22%
+
+Saved: results/fig_verify_convergence.png, results/fig_verify_plate_hole.png

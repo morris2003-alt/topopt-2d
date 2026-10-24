@@ -1,0 +1,21 @@
+A. Bridge: pinned vs roller abutment (half span 120x80, volfrac 0.25)
+   pin     c = 22.186  iterations 245  stop: compliance plateau
+   roller  c = 49.250  iterations 241  stop: compliance plateau
+   roller / pin compliance ratio = 2.22
+
+B. Stress check of the MBB design (150x50, volfrac 0.5)
+   point load, design mesh: optimizer (gray, penalized) c = 236.27, black/white c = 193.22
+   padded load, refined x4: black/white c = 182.88, full solid c = 118.21
+   black/white volume fraction 0.500
+   peak von Mises outside singular zones: optimized 0.481 at (137.1, 9.9), full solid 0.343 at (0.1, 0.1)
+   optimized design: peak / mean stress in material = 2.36
+   peak stress, optimized / full solid = 1.40  (material used 50.0%)
+
+C. Material trade-off (MBB 120x40)
+   target 0.3  black/white volume 0.300  optimized c =   303.45   uniform plate c =   427.85   stiffness gain 1.41x
+   target 0.4  black/white volume 0.400  optimized c =   233.03   uniform plate c =   320.89   stiffness gain 1.38x
+   target 0.5  black/white volume 0.500  optimized c =   193.37   uniform plate c =   256.71   stiffness gain 1.33x
+   target 0.6  black/white volume 0.600  optimized c =   165.41   uniform plate c =   213.93   stiffness gain 1.29x
+   target 0.7  black/white volume 0.700  optimized c =   149.20   uniform plate c =   183.36   stiffness gain 1.23x
+
+Saved fig_bridge.png, fig_stress_check.png, fig_tradeoff.png, extensions_summary.json

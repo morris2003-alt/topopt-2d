@@ -2,7 +2,7 @@
 run_extensions.py — engineering extensions beyond the textbook benchmarks
 =========================================================================
 A. Bridge design: half-span bridge with a solid deck under uniform load.
-   Pinned vs roller abutment -> the optimizer discovers a deck arch vs a tied arch.
+   Pinned vs roller abutment -> the optimizer discovers a half-through arch vs a tied arch.
 B. Stress check: the compliance-optimal MBB design is thresholded to black/white,
    refined 4x4, re-analysed without void elements, and its von Mises stresses are
    compared with the full solid beam.

@@ -27,6 +27,9 @@ published benchmark. Then I used it to study a few engineering questions.
   before the part could be built.
 - **Smart layout beats a plain plate.** Using the same amount of material, the optimized designs are
   1.23–1.41× stiffer than a plain solid plate.
+- **A stress limit makes the design safer for a small price.** I then added a stress constraint to the
+  optimizer. On the standard L-bracket test, it lowers the stress at the sharp inside corner by about
+  20–25% while the part loses only about 2–2.5% of its stiffness, with the same result on two meshes.
 
 ---
 
@@ -175,7 +178,86 @@ finer mesh to resolve them.
 
 ![Trade-off](results/fig_tradeoff.png)
 
-## 4. Limitations
+## 4. Stress-constrained optimization
+
+Section 3B showed that the stiffest design can have a dangerous stress hot spot. The next step was to
+let the optimizer see the stress and keep it under a limit. This part is in `src/lbracket.py`,
+`src/stress.py`, `src/verify_stress.py` and `src/run_stress.py`.
+
+### The test problem: an L-bracket
+
+The L-bracket is the standard test for stress-based topology optimization. The top of the vertical arm
+is clamped, and a downward load is spread over the upper end of the horizontal arm (with a small solid
+pad under it). The inside corner of the L is sharp. In linear elasticity the stress at a sharp
+inside corner is infinite (a stress singularity, Williams 1952), so any material that touches the
+corner is highly stressed. All runs use 40% of the L-shaped area, the density filter, and a filter
+radius of 3% of the side length.
+
+When the optimizer only looks at stiffness, it runs a member tight around the inside corner, because
+that is the shortest load path. The peak stress then sits right at the corner:
+
+![L-bracket, compliance only](results/fig_lbracket_compliance.png)
+
+Because the corner stress is singular, its value keeps growing as the mesh gets finer (2.9×, 3.7×
+and 4.2× the mean stress on 60 × 60, 100 × 100 and 140 × 140 meshes), while the compliance and the
+layout stay the same (258.2, 258.4 and 259.5). Corner stresses are therefore only compared on the same
+mesh below.
+
+### What I added
+
+1. **Stresses the optimizer can see** (`stress.py`). Each element's von Mises stress is multiplied by
+   xₑ^0.5 (stress relaxation; Bruggi 2008, Le et al. 2010). Without this, an element that is almost
+   empty still reports the stress of solid material, and the optimizer cannot remove it (the
+   "singularity phenomenon" of stress constraints; Duysinx & Bendsøe 1998).
+2. **One number instead of thousands of constraints.** The element stresses are combined with a
+   p-norm (p = 8), which is always at least as large as the true maximum and approaches it as p grows.
+   A small zone around the load (radius 6% of the side length) is left out, because the stress there
+   comes from how the load is applied, not from the design.
+3. **Sensitivities by the adjoint method.** One extra linear solve gives the derivative of the p-norm
+   stress with respect to every element density.
+4. **A different update rule.** The optimality-criteria update in `topopt.py` can only handle the
+   volume constraint, so the stress-constrained runs use the Method of Moving Asymptotes (MMA;
+   Svanberg 1987) through the `mmapy` package. The problem is: minimize compliance, subject to the
+   volume limit and the p-norm stress limit.
+
+### How I checked it
+
+`verify_stress.py` checks the new code before it is used:
+
+- **Stress:** constant-stress patch tests with exact answers (uniaxial tension, pure shear, equal
+  biaxial tension), a comparison with the verified stress routine in `fem.py`, the relaxation factor,
+  and the p-norm behaviour as p grows. All match to round-off.
+- **Sensitivities:** compared with central finite differences on random designs; the largest
+  relative error is about 3 × 10⁻⁴. (This check found a real bug: elements forced to be empty gave
+  0 × ∞ in the derivative.)
+- **MMA:** without the stress limit, MMA reaches a compliance of 258.2, within 0.1% of the
+  optimality-criteria result (258.4) on the same 100 × 100 mesh.
+
+### Results
+
+The stress limit is set as a fraction of the p-norm stress of the unconstrained design, so the same
+settings can be compared on different meshes. The stress values below are for the black/white part
+(same volume), analysed again on the same mesh.
+
+![Stress-constrained L-bracket, 100 x 100](results/fig_stress_constrained.png)
+
+| Stress limit | Stiffness loss (100 × 100) | Stiffness loss (140 × 140) | Corner stress (100 × 100) | Corner stress (140 × 140) |
+|---|---|---|---|---|
+| None | — | — | reference | reference |
+| 0.90 × unconstrained | +0.8% | +1.7% | −10% | −9% |
+| 0.80 × unconstrained | +2.2% | +2.5% | −25% | −20% |
+
+The stress limit moves the horizontal member down and away from the corner, so the joint becomes
+smoother and the corner stress drops. The layouts and the trend are the same on both meshes.
+
+**A result I did not keep.** With a slightly tighter limit (0.78 ×), the 100 × 100 run found a different
+layout in which the horizontal member slopes well away from the corner (corner stress −37%, but 9.4%
+stiffness loss). The 140 × 140 run did not reproduce it; it found the same layout as the 0.80 × case.
+The 100 × 100 result is a different local optimum, which is common in stress-constrained problems, so
+it is not used as a conclusion. Both runs are in `results/stress_study_summary.json` and
+`results/stress_study_140_summary.json`.
+
+## 5. Limitations
 
 - 2D only, linear elastic, one load case, and only one goal (stiffness).
 - The density filter leaves blurry gray edges. I didn't add a sharpening step (such as Heaviside
@@ -183,11 +265,18 @@ finer mesh to resolve them.
 - In the stress check, the part edges are jagged, so peak stresses at corners depend on the mesh.
 - The larger runs stop when the compliance changes by less than 0.01% over 10 iterations. The
   benchmark runs use the original stopping rule from the paper (design change below 0.01).
+- Stress-constrained runs: the stress-constrained problem has many local optima, so results depend on
+  the settings and the mesh (see the 0.78 × case above). Some runs stopped at the iteration cap (700)
+  while still satisfying both constraints. Thin gray members appear near the load pad; the black/white
+  parts are still connected and carry the load, but spreading the load more widely would be cleaner.
+  The comparison with the literature is qualitative only: published L-bracket studies use different
+  formulations (for example minimum volume with local stress constraints), so the numbers are not
+  directly comparable.
 
-## 5. What could come next
+## 6. What could come next
 
 - Heaviside projection, for crisp solid/empty designs
-- Optimization with a stress limit (p-norm aggregation)
+- Stress constraints with adaptive p-norm scaling (Le et al. 2010) and a minimum-volume formulation
 - Multiple load cases, and 3D with an iterative solver
 - Smoothing the boundary and exporting the shape to CAD or STL
 
@@ -199,11 +288,17 @@ cd src
 python verify_fem.py        # checks the solver against exact solutions
 python run_benchmarks.py    # published benchmark, mesh study, cantilever, GIF
 python run_extensions.py    # bridge, stress check, material trade-off
+python lbracket.py          # L-bracket, compliance only (about 30 s)
+python verify_stress.py     # checks for the stress constraint (a few seconds)
+python run_stress.py        # stress-constrained L-bracket study, 100 x 100 (about 10 min)
+python run_stress.py 140    # the same study on a 140 x 140 mesh (longer)
 ```
 
-All three scripts together take about 5 minutes. The results were reproduced exactly on both Windows
-and Linux (tested with Python 3.13). Every figure and a JSON summary of each run are saved in `results/`, along with
-a text copy of each run's console output.
+The first three scripts together take about 5 minutes. Their results were reproduced exactly on Windows
+(Python 3.14) and Linux (Python 3.13). The stress-constrained study agrees between the two systems to
+within 0.3%: the long MMA runs accumulate tiny round-off differences, which do not change any of the
+percentages reported above. Every figure and a JSON summary of each run are saved in `results/`; the
+first three scripts also have a text copy of their console output there.
 
 To run a single case from Python (from inside `src/`):
 
@@ -222,6 +317,10 @@ src/
   verify_fem.py       checks against the plate-with-hole and cantilever solutions
   run_benchmarks.py   published benchmark, mesh study, cantilever, animation
   run_extensions.py   bridge, stress check, material trade-off
+  lbracket.py         L-bracket problem and compliance-only reference
+  stress.py           relaxed stresses, p-norm stress and its adjoint sensitivity
+  verify_stress.py    checks for stress.py (exact answers and finite differences)
+  run_stress.py       stress-constrained optimization with MMA, and the study
   style.py            shared figure style
 results/              figures, GIF, and the saved output of every run
 ```
@@ -230,9 +329,19 @@ results/              figures, GIF, and the saved output of every run
 
 - Andreassen, E., Clausen, A., Schevenels, M., Lazarov, B. S., & Sigmund, O. (2011). Efficient topology
   optimization in MATLAB using 88 lines of code. *Structural and Multidisciplinary Optimization*, 43, 1–16.
-- Bendsøe, M. P., & Sigmund, O. (2003). *Topology Optimization: Theory, Methods and Applications*. Springer.
+- Bendsøe, M. P., & Sigmund, O. (2003). *Topology Optimization: Theory, Methods, and Applications* (2nd ed.). Springer.
+- Bruggi, M. (2008). On an alternative approach to stress constraints relaxation in topology
+  optimization. *Structural and Multidisciplinary Optimization*, 36, 125–141.
 - Bruns, T. E., & Tortorelli, D. A. (2001). Topology optimization of non-linear elastic structures and
   compliant mechanisms. *Computer Methods in Applied Mechanics and Engineering*, 190, 3443–3459.
+- Duysinx, P., & Bendsøe, M. P. (1998). Topology optimization of continuum structures with local stress
+  constraints. *International Journal for Numerical Methods in Engineering*, 43, 1453–1478.
+- Le, C., Norato, J., Bruns, T., Ha, C., & Tortorelli, D. (2010). Stress-based topology optimization for
+  continua. *Structural and Multidisciplinary Optimization*, 41, 605–620.
 - Sigmund, O. (2001). A 99 line topology optimization code written in Matlab. *Structural and
   Multidisciplinary Optimization*, 21, 120–127.
+- Svanberg, K. (1987). The method of moving asymptotes—a new method for structural optimization.
+  *International Journal for Numerical Methods in Engineering*, 24, 359–373.
 - Timoshenko, S. P., & Goodier, J. N. (1970). *Theory of Elasticity* (3rd ed.). McGraw-Hill.
+- Williams, M. L. (1952). Stress singularities resulting from various boundary conditions in angular
+  corners of plates in extension. *Journal of Applied Mechanics*, 19, 526–528.

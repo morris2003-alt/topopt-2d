@@ -1,0 +1,15 @@
+{
+  "nelx": 100,
+  "vol_L": 0.4,
+  "rmin": 3.0,
+  "c_opt": 258.4424,
+  "iters": 153,
+  "c_blackwhite": 203.5844,
+  "peak_vm": 0.9911,
+  "peak_location": [
+    39.5,
+    40.5
+  ],
+  "distance_to_corner": 0.7,
+  "peak_over_mean": 3.679
+}

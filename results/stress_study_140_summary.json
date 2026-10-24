@@ -1,0 +1,83 @@
+[
+  {
+    "ratio": null,
+    "s_lim": null,
+    "c": 259.795,
+    "vol": 0.4,
+    "sPN": 1.1075,
+    "iters": 107,
+    "feasible": true,
+    "c_bw": 202.7818,
+    "peak": 0.8136,
+    "peak_xy": [
+      55.5,
+      56.5
+    ],
+    "peak_to_corner": 0.7071,
+    "corner": 0.8136,
+    "peak_over_mean": 4.2072
+  },
+  {
+    "ratio": 0.9,
+    "s_lim": 0.9968,
+    "c": 264.1757,
+    "vol": 0.4,
+    "sPN": 0.9968,
+    "iters": 514,
+    "feasible": true,
+    "c_bw": 213.405,
+    "peak": 0.7438,
+    "peak_xy": [
+      55.5,
+      56.5
+    ],
+    "peak_to_corner": 0.7071,
+    "corner": 0.7438,
+    "peak_over_mean": 3.8288,
+    "stiffness_loss_pct": 1.6862,
+    "corner_reduction_pct": 8.5894,
+    "peak_reduction_pct": 8.5894
+  },
+  {
+    "ratio": 0.8,
+    "s_lim": 0.886,
+    "c": 266.1616,
+    "vol": 0.4,
+    "sPN": 0.886,
+    "iters": 515,
+    "feasible": true,
+    "c_bw": 214.7399,
+    "peak": 0.654,
+    "peak_xy": [
+      55.5,
+      56.5
+    ],
+    "peak_to_corner": 0.7071,
+    "corner": 0.654,
+    "peak_over_mean": 3.3522,
+    "stiffness_loss_pct": 2.4506,
+    "corner_reduction_pct": 19.6152,
+    "peak_reduction_pct": 19.6152
+  },
+  {
+    "ratio": 0.78,
+    "s_lim": 0.8639,
+    "c": 266.2135,
+    "vol": 0.4,
+    "sPN": 0.8639,
+    "iters": 652,
+    "feasible": true,
+    "c_bw": 214.6637,
+    "peak": 0.6243,
+    "peak_xy": [
+      55.5,
+      56.5
+    ],
+    "peak_to_corner": 0.7071,
+    "corner": 0.6243,
+    "peak_over_mean": 3.1985,
+    "stiffness_loss_pct": 2.4706,
+    "corner_reduction_pct": 23.2656,
+    "peak_reduction_pct": 23.2656
+  }
+]

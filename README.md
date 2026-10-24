@@ -202,8 +202,8 @@ python run_extensions.py    # bridge, stress check, material trade-off
 ```
 
 All three scripts together take about 5 minutes. The results were reproduced exactly on both Windows
-and Linux (tested with Python 3.13). Every figure, plus a text and JSON copy of each run's output,
-is saved in `results/`.
+and Linux (tested with Python 3.13). Every figure and a JSON summary of each run are saved in `results/`, along with
+a text copy of each run's console output.
 
 To run a single case from Python (from inside `src/`):
 

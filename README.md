@@ -29,7 +29,7 @@ published benchmark. Then I used it to study a few engineering questions.
   1.23–1.41× stiffer than a plain solid plate.
 - **A stress limit makes the design safer for a small price.** I then added a stress constraint to the
   optimizer. On the standard L-bracket test, it lowers the stress at the sharp inside corner by about
-  20–25% while the part loses only about 2–2.5% of its stiffness, with the same result on two meshes.
+  19–25% while the part loses only about 2–3% of its stiffness, with the same trend on three meshes.
 
 ---
 
@@ -241,21 +241,27 @@ settings can be compared on different meshes. The stress values below are for th
 
 ![Stress-constrained L-bracket, 100 x 100](results/fig_stress_constrained.png)
 
-| Stress limit | Stiffness loss (100 × 100) | Stiffness loss (140 × 140) | Corner stress (100 × 100) | Corner stress (140 × 140) |
-|---|---|---|---|---|
-| None | — | — | reference | reference |
-| 0.90 × unconstrained | +0.8% | +1.7% | −10% | −9% |
-| 0.80 × unconstrained | +2.2% | +2.5% | −25% | −20% |
+| Stress limit | Mesh | Stiffness loss | Corner stress |
+|---|---|---|---|
+| 0.90 × unconstrained | 100 × 100 | +0.8% | −10% |
+| | 140 × 140 | +1.7% | −9% |
+| | 200 × 200 | +2.3% | −9% |
+| 0.80 × unconstrained | 100 × 100 | +2.2% | −25% |
+| | 140 × 140 | +2.5% | −20% |
+| | 200 × 200 | +3.0% | −19% |
 
 The stress limit moves the horizontal member down and away from the corner, so the joint becomes
-smoother and the corner stress drops. The layouts and the trend are the same on both meshes.
+smoother and the corner stress drops. The layouts and the trend are the same on all three meshes. On
+finer meshes the stiffness cost grows slightly and the corner-stress reduction shrinks slightly, so
+the conservative summary is: about 19–25% lower corner stress for about 2–3% of the stiffness.
 
 **A result I did not keep.** With a slightly tighter limit (0.78 ×), the 100 × 100 run found a different
 layout in which the horizontal member slopes well away from the corner (corner stress −37%, but 9.4%
-stiffness loss). The 140 × 140 run did not reproduce it; it found the same layout as the 0.80 × case.
-The 100 × 100 result is a different local optimum, which is common in stress-constrained problems, so
-it is not used as a conclusion. Both runs are in `results/stress_study_summary.json` and
-`results/stress_study_140_summary.json`.
+stiffness loss). The 140 × 140 and 200 × 200 runs did not reproduce it; both found the same layout as
+the 0.80 × case. The 100 × 100 result is a different local optimum, which is common in
+stress-constrained problems, so it is not used as a conclusion. All runs are in
+`results/stress_study_summary.json`, `results/stress_study_140_summary.json` and
+`results/stress_study_200_summary.json`.
 
 ## 5. Limitations
 
@@ -292,6 +298,7 @@ python lbracket.py          # L-bracket, compliance only (about 30 s)
 python verify_stress.py     # checks for the stress constraint (a few seconds)
 python run_stress.py        # stress-constrained L-bracket study, 100 x 100 (about 10 min)
 python run_stress.py 140    # the same study on a 140 x 140 mesh (longer)
+python run_stress.py 200    # and on a 200 x 200 mesh (about 1 hour)
 ```
 
 The first three scripts together take about 5 minutes. Their results were reproduced exactly on Windows
